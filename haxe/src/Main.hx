@@ -36,16 +36,23 @@ class Main
 		addHxml(path);
 
 		// get all lib paths
+		var found = 0;
 		for (lib in libs.keys())
 		{
 			var path = getLibPath(lib);
 			if (path == null)
 				continue;
+			found++;
 			Sys.println(path);
 			// Sys.println('$lib,$path');
 		}
-		var libs = [ for (lib in libs.keys()) lib => getLibPath(lib) ];
-
+#if debug
+		if (found == 0)
+		{
+			Sys.println('No records found');
+			Sys.println('For hxml $path and libs $libs');
+		}
+#end
 	}
 
 	private static function getLibPath(lib:String)

@@ -58,6 +58,7 @@ call add(g:ctrlp_ext_vars, {
 	\ 'lname': 'see haxelibs for file',
 	\ 'sname': 'haxelibs',
 	\ 'type': 'path',
+	\ 'enter': 'ctrlp#haxelibs#enter()',
 	\ 'opts': 'ctrlp#haxelibs#opts()',
 	\ 'sort': 1,
 	\ 'specinput': 0,
@@ -71,8 +72,10 @@ call add(g:ctrlp_ext_vars, {
 let s:current_path = expand('<sfile>:p:h')
 function! ctrlp#haxelibs#init()
 	let neko_location = s:current_path . "/../../haxe/bin/get_libs.n"
-	echo neko_location
-	let paths = split(system('neko ' . '"' . neko_location . '"' . ' "' . g:vaxe_hxml . '"'), "\n")
+	if !exists("g:last_vaxe_hxml") || !filereadable(g:last_vaxe_hxml)
+		return ["No HXML was selected by vaxe!"]
+	endif
+	let paths = split(system('neko ' . '"' . fnameescape(neko_location) . '"' . ' "' . fnameescape(g:last_vaxe_hxml) . '"'), "\n")
 	return paths
 endfunction
 
@@ -92,6 +95,21 @@ endfunction
 
 " (optional) Do something before enterting ctrlp
 function! ctrlp#haxelibs#enter()
+	if !exists("g:vaxe_hxml") || g:vaxe_hxml == ''
+		if !exists("b:vaxe_hxml") || b:vaxe_hxml == ''
+			call vaxe#DefaultHxml()
+			if !exists("b:vaxe_hxml") || b:vaxe_hxml == ''
+				return
+			else
+				let g:last_vaxe_hxml = b:vaxe_hxml
+			endif
+		else
+			let g:last_vaxe_hxml = b:vaxe_hxml
+		endif
+	else
+		let g:last_vaxe_hxml = g:vaxe_hxml
+	endif
+
 endfunction
 
 
